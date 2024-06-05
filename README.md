@@ -1,10 +1,6 @@
 # 05 Third-Party APIs: Task Board
 
-## Your Task
-
-Create a simple task board application that allows a team to manage project tasks by modifying starter code. This app will run in the browser and feature dynamically updated HTML and CSS powered by jQuery.
-
-You'll need to use the [Day.js](https://day.js.org/en/) library to work with dates. Be sure to read the documentation carefully and concentrate on using Day.js in the browser.
+As a user i want to be able to input a task with a title, due date, and descritpion of the task.  Once the form has been filled out it will  be colored either red(Overdue), yellow(due today), or white(on time).  The user will be able to drag and drop the task cards on any of the lanes.  Once a task is placed on the done lane, it is automatically changed to white and you can now delete the task.
 
 ## User Story
 
@@ -14,87 +10,66 @@ I WANT a task board
 SO THAT I can add individual project tasks, manage their state of progress and track overall project progress accordingly
 ```
 
-## Acceptance Criteria
+## Notable code
 
-```md
-GIVEN a task board to manage a project
-WHEN I open the task board
-THEN the list of project tasks is displayed in columns representing the task progress state (Not Yet Started, In Progress, Completed)
-WHEN I view the task board for the project
-THEN each task is color coded to indicate whether it is nearing the deadline (yellow) or is overdue (red)
-WHEN I click on the button to define a new task
-THEN I can enter the title, description and deadline date for the new task into a modal dialog
-WHEN I click the save button for that task
-THEN the properties for that task are saved in localStorage
-WHEN I drag a task to a different progress column
-THEN the task's progress state is updated accordingly and will stay in the new column after refreshing
-WHEN I click the delete button for a task
-THEN the task is removed from the task board and will not be added back after refreshing
-WHEN I refresh the page
-THEN the saved tasks persist
+Code that creates a modal with a form to add tasks.  In bootstrap it is a bit difficult to find an actual modal with a form.  Thus combining some of the given structures in the website to make this modal functional.
+```
+    <div id="task-modal" style="display: none">
+      <form>
+        <label for="title">Task Title</label>
+        <input type="text" id="title" placeholder="Please enter title">
+
+        <label for="due-date">Task Due Date</label>
+        <input type="text" id="due-date" placeholder="Please enter due date">
+
+        <label for="description">Task Description</label>
+        <input type="textarea" id="description" placeholder="Please enter description">
+
+        <button id="submit-button">Submit</button>
+      </form>
+    </div>
+    
 ```
 
-The following animation demonstrates the application functionality:
+this code will allow for the creation of a task card and change the background based on the due date.
+```
+function createTaskCard(project) {
+  const taskCard = $("<div>")
+    .addClass("card project-card draggable my-3")
+    .attr("data-project-id", project.id);
+  const cardHeader = $("<div>").addClass("card-header h4").text(project.name);
+  const cardBody = $("<div>").addClass("card-body");
+  const cardDescription = $("<p>").addClass("card-text").text(project.type);
+  const cardDueDate = $("<p>").addClass("card-text").text(project.dueDate);
+  const cardDeleteBtn = $("<button>")
+    .addClass("btn btn-danger delete")
+    .text("Delete")
+    .attr("data-project-id", project.id);
+  cardDeleteBtn.on("click", handleDeleteTask);
 
-![A user adds three tasks to the task board and changes the state of two of them to in progress and then completion. The user then deletes the two cards in the done column.](./Assets/05-third-party-apis-homework-demo.gif)
+  if (project.dueDate && project.status !== "done") {
+    const now = dayjs();
+    const taskDueDate = dayjs(project.dueDate, "DD/MM/YYYY");
 
-## Grading Requirements
+    if (now.isSame(taskDueDate, "day")) {
+      taskCard.addClass("bg-warning text-white");
+    } else if (now.isAfter(taskDueDate)) {
+      taskCard.addClass("bg-danger text-white");
+      cardDeleteBtn.addClass("border-light");
+    }
+  }
 
-> **Note**: If a Challenge assignment submission is marked as “0”, it is considered incomplete and will not count towards your graduation requirements. Examples of incomplete submissions include the following:
->
-> * A repository that has no code
->
-> * A repository that includes a unique name but nothing else
->
-> * A repository that includes only a README file but nothing else
->
-> * A repository that only includes starter code
+  cardBody.append(cardDescription, cardDueDate, cardDeleteBtn);
+  taskCard.append(cardHeader, cardBody);
 
-This Challenge is graded based on the following criteria:
+  return taskCard;
+}
+```
 
-### Technical Acceptance Criteria: 40%
+https://luislaplace.github.io/white-board/
+https://github.com/LuisLaplace/white-board
 
-* Satisfies all of the above acceptance criteria plus the following:
 
-  * Uses the Day.js library to work with dates
-
-### Deployment: 32%
-
-* Application deployed at live URL
-
-* Application loads with no errors
-
-* Application GitHub URL submitted
-
-* GitHub repo contains application code
-
-### Application Quality: 15%
-
-* Application user experience is intuitive and easy to navigate
-
-* Application user interface style is clean and polished
-
-* Application resembles the mock-up functionality provided in the Challenge instructions
-
-### Repository Quality: 13%
-
-* Repository has a unique name
-
-* Repository follows best practices for file structure and naming conventions
-
-* Repository follows best practices for class/id naming conventions, indentation, quality comments, etc.
-
-* Repository contains multiple descriptive commit messages
-
-* Repository contains quality README file with description, screenshot, and link to deployed application
-
-## Review
-
-You are required to submit the following for review:
-
-* The URL of the deployed application
-
-* The URL of the GitHub repository, with a unique name and a README describing the project
-
-- - -
-© 2024 edX Boot Camps LLC. Confidential and Proprietary. All Rights Reserved.
+![alt text](<assets/img/Screenshot 2024-06-04 175853.png>)
+![alt text](<assets/img/Screenshot 2024-06-04 180651.png>)
+![alt text](<assets/img/Screenshot 2024-06-04 180721.png>)
